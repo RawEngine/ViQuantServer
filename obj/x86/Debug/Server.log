@@ -1,4 +1,0 @@
-﻿  Validating sources
-  Copying sources remotely to '104.248.137.208'
-  Validating architecture
-C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Application Type\Linux\1.0\Linux.targets(121,5): error : Current project architecture 'x86' is incompatible with the remote system architecture 'x64' ('x64'). Please switch the project architecture to 'x64' in Configuration Manager.

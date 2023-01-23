@@ -1,8 +1,0 @@
-﻿  Validating sources
-  Copying sources remotely to '104.248.137.208'
-  Validating architecture
-  Starting remote build
-  Compiling sources:
-  EventManager.cpp
-  Linking objects
-  Server.vcxproj -> F:\ViQuantServer\Server\bin\x64\Debug\Server.out
