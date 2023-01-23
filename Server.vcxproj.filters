@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Database\Database.cpp" />
+    <ClCompile Include="Database\DatabaseQuery.cpp" />
+    <ClCompile Include="Database\DatabaseUsers.cpp" />
+    <ClCompile Include="EventManager.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="FileNameParser.cpp" />
+    <ClCompile Include="FTPServer.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="TinyXML2\tinyxml2.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Log\Log.cpp">
+      <Filter>Log</Filter>
+    </ClCompile>
+    <ClCompile Include="API\APIServer.cpp">
+      <Filter>API</Filter>
+    </ClCompile>
+    <ClCompile Include="Analytics\Analytics.cpp">
+      <Filter>Analytics</Filter>
+    </ClCompile>
+    <ClCompile Include="CGI\CGIManager.cpp">
+      <Filter>CGI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Config.hpp" />
+    <ClInclude Include="Database\Database.hpp" />
+    <ClInclude Include="Database\DatabaseQuery.hpp" />
+    <ClInclude Include="Database\DatabaseTables.hpp" />
+    <ClInclude Include="Database\DatabaseUsers.hpp" />
+    <ClInclude Include="EventManager.hpp" />
+    <ClInclude Include="Exception.hpp" />
+    <ClInclude Include="FileNameParser.hpp" />
+    <ClInclude Include="FTPServer.hpp" />
+    <ClInclude Include="Main.hpp" />
+    <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="Socket.hpp" />
+    <ClInclude Include="ThreadPool.hpp" />
+    <ClInclude Include="TinyXML2\tinyxml2.h" />
+    <ClInclude Include="Types.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="Log\Log.hpp">
+      <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="API\APIServer.hpp">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="Analytics\Analytics.hpp">
+      <Filter>Analytics</Filter>
+    </ClInclude>
+    <ClInclude Include="CGI\CGIManager.hpp">
+      <Filter>CGI</Filter>
+    </ClInclude>
+    <ClInclude Include="Semaphore.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Server.conf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TinyXML2\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Log">
+      <UniqueIdentifier>{baf9a9a2-e7d2-4d52-a76c-7901cd8b4811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API">
+      <UniqueIdentifier>{f444cc37-c8d6-4cc7-865c-3afcdad12ec3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Analytics">
+      <UniqueIdentifier>{1db5d61f-93f1-4f17-8eee-0515ae1c2ad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGI">
+      <UniqueIdentifier>{df84d945-c52b-4876-a447-910b82646296}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
