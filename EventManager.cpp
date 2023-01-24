@@ -20,7 +20,7 @@ EventManager::EventManager(Main& rApp, U32 eventSessionTimeoutSec)
 
 // IMPORTANT: Can be called from any ThreadPool thread. (FTP Server)
 // Queue will be handled by the "EventManager::HandleQueuedFootageNotices"
-auto EventManager::AddFootageNotice(EventId eventId, const String& rName, const String& rTimestampStr, U16 timestampMs) -> void
+void EventManager::AddFootageNotice(EventId eventId, const String& rName, const String& rTimestampStr, U16 timestampMs)
 {
 	LOG_DEBUG(Log::Channel::Events, "AddFootageNotice - EventId: %u (%s) - %s:%d", eventId, rName.c_str(), rTimestampStr.c_str(), timestampMs);
 
@@ -29,7 +29,7 @@ auto EventManager::AddFootageNotice(EventId eventId, const String& rName, const 
 	mFootageMutex.unlock();
 }
 
-auto EventManager::HasSession(const String& rHashKey, EventSessionId* pEventSessionId) const -> bool
+bool EventManager::HasSession(const String& rHashKey, EventSessionId* pEventSessionId) const
 {
 	auto it = mSessionMap.find(rHashKey);
 
@@ -42,7 +42,7 @@ auto EventManager::HasSession(const String& rHashKey, EventSessionId* pEventSess
 
 // Adds the unauthenticated event session.
 // Sessions that are not authenticated in the certain amount of time will timeout.
-auto EventManager::AddSession(const String& rHashKey) -> EventSessionId
+EventSessionId EventManager::AddSession(const String& rHashKey)
 {
 	EventSessionId id;
 
@@ -89,41 +89,41 @@ auto EventManager::AddSession(const String& rHashKey) -> EventSessionId
 	return id;
 }
 
-auto EventManager::SetLastKnownFootageIndex(EventSessionId sessionId, U32 index) -> void
+void EventManager::SetLastKnownFootageIndex(EventSessionId sessionId, U32 index)
 {
 	mSessionFootageIndex.at(sessionId) = index;
 }
 
-auto EventManager::SetSessionTimepoint(EventSessionId sessionId, const TimePoint& rTP) -> void
+void EventManager::SetSessionTimepoint(EventSessionId sessionId, const TimePoint& rTP)
 {
 	mSessionTimepoints.at(sessionId) = rTP;
 }
 
-auto EventManager::SetSessionPath(EventSessionId sessionId, const String& rPath) -> void
+void EventManager::SetSessionPath(EventSessionId sessionId, const String& rPath)
 {
 	mSessionPaths.at(sessionId) = rPath;
 }
 
-auto EventManager::SetSessionArmedState(EventSessionId sessionId, bool isArmed) -> void
+void EventManager::SetSessionArmedState(EventSessionId sessionId, bool isArmed)
 {
 	mSessionArmedState.at(sessionId) = isArmed;
 }
 
-auto EventManager::EventSessionTimeoutLock(EventSessionId sessionId) -> void
+void EventManager::EventSessionTimeoutLock(EventSessionId sessionId)
 {
 //	std::lock_guard<std::mutex> lock(mSessionTimeoutLocksMutex);
 
 	mSessionTimeoutLocks.at(sessionId) = true;
 }
 
-auto EventManager::EventSessionTimeoutUnlock(EventSessionId sessionId) -> void
+void EventManager::EventSessionTimeoutUnlock(EventSessionId sessionId)
 {
 	std::lock_guard<std::mutex> lock(mSessionTimeoutLocksMutex);
 
 	mSessionTimeoutLocks.at(sessionId) = false;
 }
 
-auto EventManager::HandleTimeouts() -> void
+void EventManager::HandleTimeouts()
 {
 	const auto currentTP = std::chrono::steady_clock::now();
 
@@ -177,7 +177,7 @@ auto EventManager::HandleTimeouts() -> void
 }
 
 // TODO: The "rFilename" is not secure from the SQL injections.
-auto EventManager::HandleQueuedFootageNotices() -> void
+void EventManager::HandleQueuedFootageNotices()
 {
 	mFootageMutex.lock();
 
@@ -200,7 +200,7 @@ auto EventManager::HandleQueuedFootageNotices() -> void
 
 		std::ostringstream ss;
 
-		ss << "INSERT INTO " << Footage::TableName
+		ss  << "INSERT INTO " << Footage::TableName
 			<< " (" << Footage::Timestamp
 			<< ',' << Footage::Milliseconds
 			<< ',' << Footage::EventId
@@ -279,7 +279,7 @@ auto EventManager::HandleQueuedFootageNotices() -> void
 }
 
 // Returns the unique (Database related) id of the event.
-auto EventManager::AuthenticateSession(EventSessionId sessionId, U32 userId, U32 siteId, U32 cameraId) -> EventId
+EventId EventManager::AuthenticateSession(EventSessionId sessionId, U32 userId, U32 siteId, U32 cameraId)
 {
 	auto eventId = this->WriteEventStart(userId, siteId, cameraId);
 
@@ -291,7 +291,7 @@ auto EventManager::AuthenticateSession(EventSessionId sessionId, U32 userId, U32
 	return eventId;
 }
 
-auto EventManager::WriteEventStart(U32 userId, U32 siteId, U32 cameraId) -> EventId
+EventId EventManager::WriteEventStart(U32 userId, U32 siteId, U32 cameraId)
 {
 	using namespace Database::Table;
 
@@ -330,7 +330,7 @@ auto EventManager::WriteEventStart(U32 userId, U32 siteId, U32 cameraId) -> Even
 	return query.LastInsertId();
 }
 
-auto EventManager::WriteEventEnd(EventId eventId) -> void
+void EventManager::WriteEventEnd(EventId eventId)
 {
 	if (mSQLQuery.eventUpdate.empty())
 	{

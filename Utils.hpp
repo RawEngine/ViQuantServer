@@ -3,18 +3,19 @@
 
 namespace Utils
 {
-	auto StringFromLocaltime(String& rDateTime, U16& rMS) -> void;
-	auto StringFromLocaltime(bool needsDate = true, bool needsTime = true, bool needsMS = false) -> String;
+	void StringFromLocaltime(String& rDateTime, U16& rMS);
+	String StringFromLocaltime(bool needsDate = true, bool needsTime = true, bool needsMS = false);
 
-	auto GetCurrentWorkPath() -> String;
-	auto GetApplicationPath() -> String;
-	auto MakePath(String path) -> bool;
-	auto EndsWith(const String& rStr, const String& rEnding) -> bool;
-	auto EndsWith(const String& rStr, const char c) -> bool;
-	auto IsEqual(const String& a, const String& b) -> bool;
-//	auto GetJPEGSize(const Vector<char>& rBuffer, U16& w, U16& h) -> bool;
+	String GetCurrentWorkPath();
+	String GetApplicationPath();
 
-	auto StripText(char* pBuffer, size_t length, size_t offset) -> char*;
+	bool MakePath(String path);
+	bool EndsWith(const String& rStr, const String& rEnding);
+	bool EndsWith(const String& rStr, const char c);
+	bool IsEqual(const String& a, const String& b);
+//	bool GetJPEGSize(const Vector<char>& rBuffer, U16& w, U16& h);
+
+	char* StripText(char* pBuffer, size_t length, size_t offset);
 
 	// Converts any type of value (integer, char, etc) to a bitmask string.
 	// Sample:
@@ -22,7 +23,7 @@ namespace Utils
 	// String mask	 = ValueToBitmaskString(value);
 	// RESULT: Value "mask" will be = "00000010";
 	template <typename T>
-	auto ValueToBitmaskString(T item) -> String
+	String ValueToBitmaskString(T item)
 	{
 		std::ostringstream ss;
 
@@ -41,7 +42,7 @@ namespace Utils
 	}
 
 	template <typename T>
-	auto StringTo(const char* pValue, T& r) -> bool
+	bool StringTo(const char* pValue, T& r)
 	{
 		try
 		{
@@ -61,4 +62,3 @@ namespace Utils
 		return true;
 	}
 }
-

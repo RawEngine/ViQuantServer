@@ -63,7 +63,7 @@ struct HTTPElementType
 	HTTPElement type;
 };
 
-auto GetHTTPElementType(char* pBuffer, ssize_t size) -> HTTPElement
+HTTPElement GetHTTPElementType(char* pBuffer, ssize_t size)
 {
 	static HTTPElementType HTTPElementInfo[] =
 	{
@@ -90,7 +90,7 @@ auto GetHTTPElementType(char* pBuffer, ssize_t size) -> HTTPElement
 
 void APIServer::Update()
 {
-	this->HandleNewConnection();
+	HandleNewConnection();
 
 	if (mClientSockets.empty())
 		return;
@@ -151,7 +151,7 @@ void APIServer::Update()
 						if (pos != String::npos)
 							cgi = cgi.substr(0, pos + 1);
 
-						this->HandleCGI(static_cast<APIClientId>(i), cgi);
+						HandleCGI(static_cast<APIClientId>(i), cgi);
 						break;
 					}
 				}
@@ -200,21 +200,21 @@ void APIServer::HandleNewConnection()
 		LOG_MESSAGE(Log::Channel::API, "API connection from: %s:%d", clientIPString.c_str(), clientPort);
 	}
 
-	this->AddClient(clientSocket);
+	AddClient(clientSocket);
 }
 
 // SAMPLE: 
 // "/arm?camid=4"
 // "/arm?camid=4&camid=7&siteid=12" (Support for multiple cameras and sites)
-auto APIServer::HandleCGI(APIClientId clientId, const String& rCGI) -> void
+void APIServer::HandleCGI(APIClientId clientId, const String& rCGI)
 {
 	if (rCGI.find("/arm?") != String::npos)
 	{
-		this->HandleCGI_ArmState(rCGI.substr(5), true); // Get rid of "/arm?".
+		HandleCGI_ArmState(rCGI.substr(5), true); // Get rid of "/arm?".
 	}
 	else if (rCGI.find("/disarm?") != String::npos)
 	{
-		this->HandleCGI_ArmState(rCGI.substr(8), false); // Get rid of "/arm?".
+		HandleCGI_ArmState(rCGI.substr(8), false); // Get rid of "/arm?".
 	}
 	else
 	{
@@ -224,7 +224,7 @@ auto APIServer::HandleCGI(APIClientId clientId, const String& rCGI) -> void
 	Socket::Close(mClientSockets.at(clientId));
 }
 
-auto APIServer::HandleCGI_ArmState(const String& rCGI, bool isArmed) -> void
+void APIServer::HandleCGI_ArmState(const String& rCGI, bool isArmed)
 {
 	if (isArmed)
 		LOG_MESSAGE(Log::Channel::API, "Received ARM request: %s", rCGI.c_str());
@@ -261,21 +261,21 @@ auto APIServer::HandleCGI_ArmState(const String& rCGI, bool isArmed) -> void
 		// Determine if we're dealing with "camid" or "siteid".
 		if (rCGI.find("camid") != String::npos)
 		{
-			this->HandleCameraArmState(id, isArmed);
+			HandleCameraArmState(id, isArmed);
 		}
 		else if (rCGI.find("siteid") != String::npos)
 		{
 			// List of database camera id's that are associated with the specific site id.
 			Vector<U32> list;
 
-			if (!this->GetDatabaseFTPCamerasArmStatesBySite(id, list))
+			if (!GetDatabaseFTPCamerasArmStatesBySite(id, list))
 				continue;
 
 			// Update the entire site's is_armed state.
-			this->SetDatabaseFTPCamerasSiteArmState(id, isArmed);
+			SetDatabaseFTPCamerasSiteArmState(id, isArmed);
 
 			for (auto& rCamera : list)
-				this->HandleCameraArmState(rCamera, isArmed);
+				HandleCameraArmState(rCamera, isArmed);
 		}
 		else
 		{
@@ -285,12 +285,12 @@ auto APIServer::HandleCGI_ArmState(const String& rCGI, bool isArmed) -> void
 	}
 }
 
-auto APIServer::HandleCameraArmState(U32 cameraId, bool isArmed) -> void
+void APIServer::HandleCameraArmState(U32 cameraId, bool isArmed)
 {
 	String hashKey;
 	bool isAlreadyArmed;
 
-	if (!this->GetDatabaseFTPCameraHashKey(cameraId, hashKey, isAlreadyArmed))
+	if (!GetDatabaseFTPCameraHashKey(cameraId, hashKey, isAlreadyArmed))
 		return;
 
 	if (isArmed && isAlreadyArmed)
@@ -304,7 +304,7 @@ auto APIServer::HandleCameraArmState(U32 cameraId, bool isArmed) -> void
 		return;
 	}
 
-	this->SetDatabaseFTPCameraArmState(cameraId, isArmed);
+	SetDatabaseFTPCameraArmState(cameraId, isArmed);
 
 	// Check EventManager to see if we already have a session open 
 	// and if we need to arm or disarm the device at runtime.
@@ -314,7 +314,7 @@ auto APIServer::HandleCameraArmState(U32 cameraId, bool isArmed) -> void
 		mMain.EventManagerPtr->SetSessionArmedState(eventSessionId, isArmed);
 }
 
-auto APIServer::AddClient(SocketId socketId) -> APIClientId
+APIClientId APIServer::AddClient(SocketId socketId)
 {
 	APIClientId id;
 
@@ -342,7 +342,7 @@ auto APIServer::AddClient(SocketId socketId) -> APIClientId
 	return id;
 }
 
-auto APIServer::GetDatabaseFTPCamerasArmStatesBySite(U32 siteId, Vector<U32>& rList) -> bool
+bool APIServer::GetDatabaseFTPCamerasArmStatesBySite(U32 siteId, Vector<U32>& rList)
 {
 	using namespace Database::Table;
 
@@ -377,7 +377,7 @@ auto APIServer::GetDatabaseFTPCamerasArmStatesBySite(U32 siteId, Vector<U32>& rL
 	return true;
 }
 
-auto APIServer::GetDatabaseFTPCameraHashKey(U32 cameraId, String& rHashKey, bool& rIsArmed) -> bool
+bool APIServer::GetDatabaseFTPCameraHashKey(U32 cameraId, String& rHashKey, bool& rIsArmed)
 {
 	using namespace Database::Table;
 
@@ -420,7 +420,7 @@ auto APIServer::GetDatabaseFTPCameraHashKey(U32 cameraId, String& rHashKey, bool
 	return true;
 }
 
-auto APIServer::SetDatabaseFTPCameraArmState(U32 cameraId, bool isArmed) -> void
+void APIServer::SetDatabaseFTPCameraArmState(U32 cameraId, bool isArmed)
 {
 	std::ostringstream ss;
 
@@ -435,7 +435,7 @@ auto APIServer::SetDatabaseFTPCameraArmState(U32 cameraId, bool isArmed) -> void
 }
 
 // Sample: "UPDATE `vq_sites` SET `is_armed`=0 WHERE `id`=1 AND `deleted_at` IS NULL"
-auto APIServer::SetDatabaseFTPCamerasSiteArmState(U32 siteId, bool isArmed) -> void
+void APIServer::SetDatabaseFTPCamerasSiteArmState(U32 siteId, bool isArmed)
 {
 	std::ostringstream ss;
 

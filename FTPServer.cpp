@@ -1183,7 +1183,7 @@ FTPCommandType FTPCommandInfo[] =
 	{ nullptr, FTPCommand::Unknown },
 };
 
-auto FTPServer::GetCommandType(char* pBuffer, ssize_t size) -> FTPCommand
+FTPCommand FTPServer::GetCommandType(char* pBuffer, ssize_t size)
 {
 	for (FTPCommandType* p = FTPCommandInfo; p->name; p++)
 	{
@@ -1202,7 +1202,7 @@ auto FTPServer::GetCommandType(char* pBuffer, ssize_t size) -> FTPCommand
 	return FTPCommand::Unknown;
 }
 
-auto FTPServer::GetCommandName(FTPCommand commandType) -> String
+String FTPServer::GetCommandName(FTPCommand commandType)
 {
 	if (FTPCommandInfo[static_cast<int>(commandType)].name)
 		return FTPCommandInfo[static_cast<int>(commandType)].name;

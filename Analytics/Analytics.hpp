@@ -9,29 +9,29 @@ public:
 	Analytics(Main& rApp, const Database::Info& rDBInfo, const String& rServerAddress, U16 serverPort, U16 connectTimeoutSec);
 	~Analytics();
 
-	auto AddEvent(EventId eventId, U32 cameraId, U8 personThreshold, const String& rFootagePath) -> void;
-	auto EndEvent(EventId eventId) -> void;
+	void AddEvent(EventId eventId, U32 cameraId, U8 personThreshold, const String& rFootagePath);
+	void EndEvent(EventId eventId);
 
-	auto AddFootage(EventId eventId, EventFootageId eventFootageId, const String& rName) -> void;
-
-private:
-
-	auto ReleaseSession(AnalyticsSessionId id) -> void;
-
-	auto HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP) -> bool;
-	auto HandleRead(AnalyticsSessionId id) -> void;
-	auto HandleSend(AnalyticsSessionId id) -> void;
-	auto HandleQueuedFootageList() -> void;
-	auto HandleQueuedFootageMap() -> void;
+	void AddFootage(EventId eventId, EventFootageId eventFootageId, const String& rName);
 
 private:
 
-	auto ThreadProc() -> void;
+	void ReleaseSession(AnalyticsSessionId id);
+
+	bool HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP);
+	void HandleRead(AnalyticsSessionId id);
+	void HandleSend(AnalyticsSessionId id);
+	void HandleQueuedFootageList();
+	void HandleQueuedFootageMap();
+
+private:
+
+	void ThreadProc();
 
 	void WriteQueuedResults(Database::Connection& rDatabase);
 
-	auto WriteXMLParsedResults(Database::Connection& rDatabase, AnalyticsSessionId sessionId, U32 cameraId, EventId eventId, const String& rXML) -> EventFootageId;
-	auto WriteXML(Database::Connection& rDatabase, EventFootageId eventId, const String& rXML) -> void;
+	EventFootageId WriteXMLParsedResults(Database::Connection& rDatabase, AnalyticsSessionId sessionId, U32 cameraId, EventId eventId, const String& rXML);
+	void           WriteXML(Database::Connection& rDatabase, EventFootageId eventId, const String& rXML);
 
 private:
 

@@ -9,14 +9,14 @@ namespace Database
 		Query(Connection& rDB);
 		~Query();
 
-		auto Exec(const String& rQueryString) -> bool;
-		auto Next() -> bool;
-		auto LastInsertId() const -> U64;
-		auto NumResults() const -> U64;
+		bool Exec(const String& rQueryString);
+		bool Next();
+		U64 LastInsertId() const;
+		U64 NumResults() const;
 
 		auto Value(int index) { return mpRow[index]; }
 
-		auto ValueBool(int index) -> bool 
+		bool ValueBool(int index)
 		{ 
 			if (!mpRow[index])
 				return false;
@@ -24,7 +24,7 @@ namespace Database
 			return *mpRow[index] != '0';
 		}
 
-		auto ValueU8(int index) -> U8
+		U8 ValueU8(int index)
 		{
 			if (!mpRow[index])
 				return 0;
@@ -32,7 +32,7 @@ namespace Database
 			return static_cast<U8> (std::atoi(mpRow[index]));
 		}
 
-		auto ValueU32(int index) -> U32
+		U32 ValueU32(int index)
 		{
 			if (!mpRow[index])
 				return 0;

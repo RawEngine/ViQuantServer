@@ -11,6 +11,6 @@ namespace Database
 		constexpr auto Username = "`username`";
 		constexpr auto Password = "`password`";
 
-		auto GetId(Connection& rConnection, const String& rUsername, const String& rPassword) -> U32;
+		U32 GetId(Connection& rConnection, const String& rUsername, const String& rPassword);
 	};
 }

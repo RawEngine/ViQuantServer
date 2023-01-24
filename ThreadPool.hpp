@@ -85,13 +85,14 @@ public:
 
 private:
 
-	Vector<std::thread>			mThreads;
+	Vector<std::thread>		mThreads;
+
 	std::queue<std::function<void()>>	mTasks;
 	std::mutex							mTaskLock;
 
-	std::condition_variable				mCondition;
+	std::condition_variable	mCondition;
 
-	std::atomic_bool	mIsStopRequested{ false };
+	std::atomic_bool		mIsStopRequested{ false };
 
-	std::atomic_int		mNumTasks{ 0 };
+	std::atomic_int			mNumTasks{ 0 };
 };

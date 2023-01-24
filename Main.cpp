@@ -65,63 +65,63 @@ int Main::Run()
 
 	try
 	{
-		this->ConfigPtr = std::make_unique<Config>(this->GetPathApplication() + "Server.conf");
+		ConfigPtr = std::make_unique<Config>(GetPathApplication() + "Server.conf");
 
-		this->SetupLogSystem();
+		SetupLogSystem();
 
 		LOG_MESSAGE(Log::Channel::Main, "Num CPU cores: %d", std::thread::hardware_concurrency());
 		LOG_MESSAGE(Log::Channel::Main, "Main thread id: %s", ThreadIdToString(std::this_thread::get_id()).c_str());
-		LOG_MESSAGE(Log::Channel::Main, "Work path: %s", this->GetPathApplication().c_str());
+		LOG_MESSAGE(Log::Channel::Main, "Work path: %s", GetPathApplication().c_str());
 
-		this->SetupFootagePath();
+		SetupFootagePath();
 
-		this->SetupNotificationsManager();
+		SetupNotificationsManager();
 
-		this->SetupDatabaseConnection(dbInfo);
+		SetupDatabaseConnection(dbInfo);
 
-		this->SetupThreadPool();
+		SetupThreadPool();
 
-		this->SetupEventManager();
+		SetupEventManager();
 
-		this->SetupAnalytics(dbInfo);
+		SetupAnalytics(dbInfo);
 
 		// TEMP!
-//		this->AnalyticsPtr->AddEvent(777, this->CreateFootagePath(1, 2, 3, 4));
-//		this->AnalyticsPtr->AddFootage(777, "4_192.168.0.64_01_20190306121007711_MOTION_DETECTION.jpg");
+//		AnalyticsPtr->AddEvent(777, CreateFootagePath(1, 2, 3, 4));
+//		AnalyticsPtr->AddFootage(777, "4_192.168.0.64_01_20190306121007711_MOTION_DETECTION.jpg");
 
-		this->SetupFTPServer();
+		SetupFTPServer();
 
-		this->SetupAPIServer();
+		SetupAPIServer();
 
 		while (!gIsQuitRequested)
 		{
-			this->APIServerPtr->Update();
+			APIServerPtr->Update();
 #if 1
-			this->FTPServerPtr->HandleNewConnection();
+			FTPServerPtr->HandleNewConnection();
 
-			this->FTPServerPtr->HandleClients(*this->DatabasePtr);
+			FTPServerPtr->HandleClients(*DatabasePtr);
 
-			this->FTPServerPtr->HandleTimeouts();
+			FTPServerPtr->HandleTimeouts();
 
-			this->FTPServerPtr->HandleInactiveClients();
+			FTPServerPtr->HandleInactiveClients();
 #endif
-			this->EventManagerPtr->HandleTimeouts();
+			EventManagerPtr->HandleTimeouts();
 
-			this->EventManagerPtr->HandleQueuedFootageNotices();
+			EventManagerPtr->HandleQueuedFootageNotices();
 
-			this->CGIManagerPtr->Process();
+			CGIManagerPtr->Process();
 
 //			printf("Peu...\n");
 //			std::this_thread::sleep_for(std::chrono::seconds(3));
 		}
 
 		// TEMP!
-		this->AnalyticsPtr->EndEvent(777);
+		AnalyticsPtr->EndEvent(777);
 	}
 	catch (const Exception& e)
 	{
-		if (this->LogFilePtr)
-			this->LogFilePtr->Write(Log::Channel::Main, Log::Level::Error, __LINE__, __FUNCTION__, e.GetText());
+		if (LogFilePtr)
+			LogFilePtr->Write(Log::Channel::Main, Log::Level::Error, __LINE__, __FUNCTION__, e.GetText());
 		else
 			std::cout << "ERROR: [LOG NOT INITIALIZED] : " << e.GetText() << std::endl;
 
@@ -131,9 +131,9 @@ int Main::Run()
 	return EXIT_SUCCESS;
 }
 
-auto Main::CreateFootagePath(EventId eventId, U32 userId, U32 siteId, U32 cameraId) const -> String
+String Main::CreateFootagePath(EventId eventId, U32 userId, U32 siteId, U32 cameraId) const
 {
-	String footagePath(this->GetPathFootage());
+	String footagePath(GetPathFootage());
 	{
 		std::ostringstream ss;
 
@@ -164,7 +164,7 @@ void Main::SetupLogSystem()
 {
 	String logPath;
 
-	this->ConfigPtr->Read("log_path", logPath);
+	ConfigPtr->Read("log_path", logPath);
 
 	if (logPath.empty())
 		throw Exception("Config key \"log_path\" is missing the value!");
@@ -172,12 +172,12 @@ void Main::SetupLogSystem()
 	if (!Utils::EndsWith(logPath, '/'))
 		logPath += '/';
 
-	logPath = this->GetPathApplication() + logPath;
+	logPath = GetPathApplication() + logPath;
 
 	if (!Utils::MakePath(logPath))
 		throw ExceptionVA("Failed to setup log path: \"%s\"!", logPath.c_str());
 
-	this->LogFilePtr = std::make_unique<Log>(logPath);
+	LogFilePtr = std::make_unique<Log>(logPath);
 }
 
 void Main::SetupNotificationsManager()
@@ -185,53 +185,53 @@ void Main::SetupNotificationsManager()
 	String hostname;
 	U16 port;
 
-	this->ConfigPtr->Read("notifications_host", hostname);
-	this->ConfigPtr->Read("norifications_port", port);
+	ConfigPtr->Read("notifications_host", hostname);
+	ConfigPtr->Read("norifications_port", port);
 
 	if (hostname.empty())	throw Exception("Config key \"notifications_host\" is missing the value!");
 	if (port == 0)			throw Exception("Config key \"norifications_port\" is missing the value!");
 
-	this->CGIManagerPtr = std::make_unique<CGIManager>(hostname, port);
+	CGIManagerPtr = std::make_unique<CGIManager>(hostname, port);
 }
 
 void Main::SetupFootagePath()
 {
 	// TEMP.
 	if (mPathFor.footage.empty())
-		mPathFor.footage = this->GetPathApplication() + "footage/";
+		mPathFor.footage = GetPathApplication() + "footage/";
 
 	Utils::MakePath(mPathFor.footage);
 }
 
 void Main::SetupDatabaseConnection(Database::Info& rDBInfo)
 {
-	this->ConfigPtr->Read("db_port", rDBInfo.port);
-	this->ConfigPtr->Read("db_hostname", rDBInfo.hostname);
-	this->ConfigPtr->Read("db_username", rDBInfo.username);
-	this->ConfigPtr->Read("db_password", rDBInfo.password);
-	this->ConfigPtr->Read("db_name", rDBInfo.database);
+	ConfigPtr->Read("db_port", rDBInfo.port);
+	ConfigPtr->Read("db_hostname", rDBInfo.hostname);
+	ConfigPtr->Read("db_username", rDBInfo.username);
+	ConfigPtr->Read("db_password", rDBInfo.password);
+	ConfigPtr->Read("db_name", rDBInfo.database);
 
 	// Connect to the Database.
-	this->DatabasePtr = std::make_unique<Database::Connection>();
+	DatabasePtr = std::make_unique<Database::Connection>();
 
 	LOG_MESSAGE(Log::Channel::Main, "Connecting to the Database (%s:%d)", rDBInfo.hostname.c_str(), rDBInfo.port);
 
-	if (!this->DatabasePtr->Connect(rDBInfo, 7, 3))
+	if (!DatabasePtr->Connect(rDBInfo, 7, 3))
 		throw Exception("Failed to connect to the Database!");
 }
 
 void Main::SetupThreadPool()
 {
-	this->ThreadPoolPtr = std::make_unique<ThreadPool>(2);
+	ThreadPoolPtr = std::make_unique<ThreadPool>(2);
 }
 
 void Main::SetupEventManager()
 {
 	U32 eventSessionTimoutSec;
 
-	this->ConfigPtr->Read("event_session_timeout_sec", eventSessionTimoutSec);
+	ConfigPtr->Read("event_session_timeout_sec", eventSessionTimoutSec);
 
-	this->EventManagerPtr = std::make_unique<EventManager> (*this, eventSessionTimoutSec);
+	EventManagerPtr = std::make_unique<EventManager> (*this, eventSessionTimoutSec);
 }
 
 void Main::SetupAnalytics(const Database::Info& rDBInfo)
@@ -240,11 +240,11 @@ void Main::SetupAnalytics(const Database::Info& rDBInfo)
 	U16	serverPort;
 	U16	connectTimeoutSec;
 
-	this->ConfigPtr->Read("analytics_address", serverAddres);
-	this->ConfigPtr->Read("analytics_port", serverPort);
-	this->ConfigPtr->Read("analytics_connect_timeout_sec", connectTimeoutSec);
+	ConfigPtr->Read("analytics_address", serverAddres);
+	ConfigPtr->Read("analytics_port", serverPort);
+	ConfigPtr->Read("analytics_connect_timeout_sec", connectTimeoutSec);
 
-	this->AnalyticsPtr = std::make_unique<Analytics>(*this, rDBInfo, serverAddres, serverPort, connectTimeoutSec);
+	AnalyticsPtr = std::make_unique<Analytics>(*this, rDBInfo, serverAddres, serverPort, connectTimeoutSec);
 }
 
 void Main::SetupFTPServer()
@@ -252,8 +252,8 @@ void Main::SetupFTPServer()
 	U16 port;
 	U32 passiveSocketTimeout;
 
-	this->ConfigPtr->Read("ftp_port", port);
-	this->ConfigPtr->Read("ftp_passive_soc_timeout_sec", passiveSocketTimeout);
+	ConfigPtr->Read("ftp_port", port);
+	ConfigPtr->Read("ftp_passive_soc_timeout_sec", passiveSocketTimeout);
 
 	if (port == 0)
 		throw Exception("Config is missing FTP server port!");
@@ -264,9 +264,9 @@ void Main::SetupFTPServer()
 		LOG_WARNING(Log::Channel::Main, "Config \"ftp_passive_soc_timeout_sec\" not set! (Using default, %u seconds)", passiveSocketTimeout);
 	}
 
-	this->FTPServerPtr = std::make_unique<FTPServer>(*this, passiveSocketTimeout);
+	FTPServerPtr = std::make_unique<FTPServer>(*this, passiveSocketTimeout);
 
-	if (!this->FTPServerPtr->Start(port))
+	if (!FTPServerPtr->Start(port))
 		throw Exception("FTP server failed to start!");
 }
 
@@ -274,14 +274,14 @@ void Main::SetupAPIServer()
 {
 	U16 port;
 
-	this->ConfigPtr->Read("api_port", port);
+	ConfigPtr->Read("api_port", port);
 
 	if (port == 0)
 		throw Exception("Config is missing API server port!");
 
-	this->APIServerPtr = std::make_unique<APIServer>(*this);
+	APIServerPtr = std::make_unique<APIServer>(*this);
 
-	if (!this->APIServerPtr->Start(port))
+	if (!APIServerPtr->Start(port))
 		throw Exception("API server failed to start!");
 }
 

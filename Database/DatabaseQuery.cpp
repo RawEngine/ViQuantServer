@@ -6,7 +6,8 @@
 
 namespace Database
 {
-	Query::Query(Connection& rDB) : mConnection(rDB)
+	Query::Query(Connection& rDB) 
+		: mConnection(rDB)
 	{ }
 
 	Query::~Query()
@@ -15,16 +16,14 @@ namespace Database
 			mysql_free_result(mpResult);
 	}
 
-	auto Query::Exec(const String& rQueryString) -> bool
+	bool Query::Exec(const String& rQueryString)
 	{
 		auto handle = mConnection.GetHandle();
 
 		if (mysql_ping(handle) != 0)
 		{
 			LOG_WARNING(Log::Channel::DB, "Disconnected from the Database! (Trying to reconnec)");
-
 			mConnection.ReConnect();
-			// TODO...
 		}
 
 		if (mysql_query(handle, rQueryString.c_str()) != 0)
@@ -38,7 +37,7 @@ namespace Database
 		return true;
 	}
 
-	auto Query::Next() -> bool
+	bool Query::Next()
 	{
 		if (!mpResult)
 			return false;
@@ -51,12 +50,12 @@ namespace Database
 		return true;
 	}
 
-	auto Query::LastInsertId() const -> U64
+	U64 Query::LastInsertId() const
 	{
 		return static_cast<U64> (mysql_insert_id(mConnection.GetHandle()));
 	}
 
-	auto Query::NumResults() const -> U64
+	U64 Query::NumResults() const
 	{
 		if (!mpResult)
 			return 0;

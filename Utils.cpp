@@ -15,7 +15,7 @@
 
 namespace Utils
 {
-	auto StringFromLocaltime(String& rDateTime, U16& rMS) -> void
+	void StringFromLocaltime(String& rDateTime, U16& rMS)
 	{
 		auto now = std::chrono::system_clock::now();
 		auto posixTime = std::chrono::system_clock::to_time_t(now);
@@ -30,7 +30,7 @@ namespace Utils
 		rMS = ms.count();
 	}
 
-	auto StringFromLocaltime(bool needsDate /* = true */, bool needsTime /* = true */, bool needsMS /* = false */) -> String
+	String StringFromLocaltime(bool needsDate /* = true */, bool needsTime /* = true */, bool needsMS /* = false */)
 	{
 		auto now = std::chrono::system_clock::now();
 		auto posixTime = std::chrono::system_clock::to_time_t(now);
@@ -63,7 +63,7 @@ namespace Utils
 
 
 	// NOTE: Might change at runtime.
-	auto Utils::GetCurrentWorkPath() -> String
+	String Utils::GetCurrentWorkPath()
 	{
 #if PLATFORM_WINDOWS
 		char output[MAX_PATH];
@@ -80,7 +80,7 @@ namespace Utils
 		return output;
 	}
 
-	auto Utils::GetApplicationPath() -> String
+	String Utils::GetApplicationPath()
 	{
 #if PLATFORM_WINDOWS
 		char buffer[1024];
@@ -114,7 +114,7 @@ namespace Utils
 	}
 
 	// https://stackoverflow.com/questions/675039/how-can-i-create-directory-tree-in-c-linux
-	auto Utils::MakePath(String path) -> bool
+	bool Utils::MakePath(String path)
 	{
 		//	printf("Utils::MakePath: %s\n", path.c_str());
 
@@ -148,7 +148,7 @@ namespace Utils
 	}
 
 	// NOTE: "String::ends_with" contains this, but only from C++ 20
-	auto Utils::EndsWith(const String& rStr, const String& rEnding) -> bool
+	bool Utils::EndsWith(const String& rStr, const String& rEnding)
 	{
 		if (rStr.length() < rEnding.length())
 			return false;
@@ -156,7 +156,7 @@ namespace Utils
 		return rStr.compare(rStr.length() - rEnding.length(), rEnding.length(), rEnding) == 0;
 	}
 
-	auto Utils::EndsWith(const String& rStr, const char c) -> bool
+	bool Utils::EndsWith(const String& rStr, const char c)
 	{
 		if (rStr.size() > 0 && rStr[rStr.size() - 1] == c)
 			return true;
@@ -169,7 +169,7 @@ namespace Utils
 		return false;
 	}
 
-	auto Utils::IsEqual(const String& a, const String& b) -> bool
+	bool Utils::IsEqual(const String& a, const String& b)
 	{
 		return std::equal(
 			a.begin(), a.end(),
@@ -177,7 +177,7 @@ namespace Utils
 			[](char a, char b) { return tolower(a) == tolower(b); });
 	}
 
-	auto Utils::StripText(char* pBuffer, size_t length, size_t offset) -> char*
+	char* Utils::StripText(char* pBuffer, size_t length, size_t offset)
 	{
 		char* pText = &pBuffer[offset];
 
@@ -238,7 +238,7 @@ namespace Utils
 	/*
 	// HM: Nera taip paprasta tiesiog surasti markerius + remtis palei JFIF ar tai yra tikrai JPEG'as
 	// Yra nemazai JPEG'u kuriuose isviso nebuna JFIF arba jis buna nustumtas kur nors toliau/giliau faile...
-	auto Utils::GetJPEGSize(const Vector<char>& rBuffer, U16& w, U16& h) -> bool
+	bool Utils::GetJPEGSize(const Vector<char>& rBuffer, U16& w, U16& h)
 	{
 		size_t i = 0;
 

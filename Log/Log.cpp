@@ -15,14 +15,14 @@ Log::Log(const String& rPath)
 {
 	gpLog = this;
 
-	this->Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "=======================================================================");
-	this->Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "Start [LOG PATH: \"" + rPath + "\"]");
-	this->Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "=======================================================================");
+	Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "=======================================================================");
+	Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "Start [LOG PATH: \"" + rPath + "\"]");
+	Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "=======================================================================");
 }
 
 Log::~Log()
 {
-	this->Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "End.");
+	Write(Channel::Main, Level::Info, __LINE__, __FUNCTION__, "End.");
 
 	mIsStopRequested = true;
 
@@ -57,10 +57,10 @@ void Log::WriteVA(Channel channel, Level level, int line, const char* pFunctionN
 
 	buffer[sizeof(buffer) - 1] = 0;
 
-	this->Write(channel, level, line, pFunctionName, String(buffer, length));
+	Write(channel, level, line, pFunctionName, String(buffer, length));
 }
 
-auto Log::ThreadProc() -> void
+void Log::ThreadProc()
 {
 	String fileName;
 	{

@@ -25,12 +25,12 @@ namespace Database
 		bool ReConnect();
 
 #if 0
-		auto Get(
+		void Get(
 			const String& rTableName,
 			const Vector<String>& rSelectList,
-			const Vector<std::pair<String, String>>& rFromList) -> void;
+			const Vector<std::pair<String, String>>& rFromList);
 #endif
-		auto EscapeString(const String& rInput) -> String;
+		String EscapeString(const String& rInput);
 
 		auto GetHandle() { return mpHandle; }
 
@@ -39,5 +39,4 @@ namespace Database
 		Info	mInfo;
 		MYSQL*	mpHandle = nullptr;
 	};
-
-} // namespace Database
+}

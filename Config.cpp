@@ -36,4 +36,3 @@ void Config::Read(const char* pKey, String& r) const
 		LOG_ERROR(Log::Channel::Main, "Config key \"%s\" not found!", pKey);
 	}
 }
-

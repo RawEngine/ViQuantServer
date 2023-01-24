@@ -23,7 +23,7 @@ public:
 
 	int Run();
 
-	auto CreateFootagePath(EventId eventId, U32 userId, U32 siteId, U32 cameraId) const -> String;
+	String CreateFootagePath(EventId eventId, U32 userId, U32 siteId, U32 cameraId) const;
 
 	const String& GetPathApplication();
 	const String& GetPathFootage() const;

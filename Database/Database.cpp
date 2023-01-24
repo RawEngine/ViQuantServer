@@ -73,10 +73,10 @@ namespace Database
 #endif
 */
 
-	auto Connection::Get(
+	void Connection::Get(
 		const String& rTableName,
 		const Vector<String>& rSelectList,
-		const Vector<std::pair<String, String>>& rFromList) -> void
+		const Vector<std::pair<String, String>>& rFromList)
 	{
 		std::ostringstream ss;
 
@@ -128,7 +128,7 @@ namespace Database
 #endif
 
 	// TODO: More secure...
-	auto Connection::EscapeString(const String& rInput) -> String
+	String Connection::EscapeString(const String& rInput)
 	{
 		Vector<char> output(rInput.length() * 2 + 1, 0);
 
@@ -139,7 +139,7 @@ namespace Database
 	}
 
 	/*
-	auto Connection::Query(const String& rSQLQuery) -> MYSQL_RES*
+	MYSQL_RES* Connection::Query(const String& rSQLQuery)
 	{
 		if (mysql_ping(mpHandle) != 0)
 		{
@@ -157,5 +157,4 @@ namespace Database
 		return true;
 	}
 	*/
-
-} // namespace Database
+}

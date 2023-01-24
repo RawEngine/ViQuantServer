@@ -9,23 +9,24 @@ public:
 	EventManager(Main& rApp, U32 eventSessionTimeoutSec);
 	EventManager(const EventManager&) = delete;
 
-	auto EventSessionTimeoutLock(EventSessionId sessionId) -> void;
-	auto EventSessionTimeoutUnlock(EventSessionId sessionId) -> void;
+	void EventSessionTimeoutLock(EventSessionId sessionId);
+	void EventSessionTimeoutUnlock(EventSessionId sessionId);
 
-	auto AddFootageNotice(EventId eventId, const String& rName, const String& rTimestampStr, U16 timestampMs) -> void;
+	void AddFootageNotice(EventId eventId, const String& rName, const String& rTimestampStr, U16 timestampMs);
 
-	auto HasSession(const String& rHashKey, EventSessionId* pEventSessionId) const -> bool;
-	auto AddSession(const String& rHashKey) -> EventSessionId;
+	bool HasSession(const String& rHashKey, EventSessionId* pEventSessionId) const;
 
-	auto SetLastKnownFootageIndex(EventSessionId sessionId, U32 index) -> void;
-	auto SetSessionTimepoint(EventSessionId sessionId, const TimePoint& rTP) -> void;
-	auto SetSessionPath(EventSessionId sessionId, const String& rPath) -> void;
-	auto SetSessionArmedState(EventSessionId sessionId, bool isArmed) -> void;
+	EventSessionId AddSession(const String& rHashKey);
 
-	auto HandleTimeouts() -> void;
-	auto HandleQueuedFootageNotices() -> void;
+	void SetLastKnownFootageIndex(EventSessionId sessionId, U32 index);
+	void SetSessionTimepoint(EventSessionId sessionId, const TimePoint& rTP);
+	void SetSessionPath(EventSessionId sessionId, const String& rPath);
+	void SetSessionArmedState(EventSessionId sessionId, bool isArmed);
 
-	auto AuthenticateSession(EventSessionId sessionId, U32 userId, U32 siteId, U32 cameraId) -> EventId;
+	void HandleTimeouts();
+	void HandleQueuedFootageNotices();
+
+	EventId AuthenticateSession(EventSessionId sessionId, U32 userId, U32 siteId, U32 cameraId);
 
 	auto& GetFootagePath(EventSessionId sessionId) const
 	{ 
@@ -54,8 +55,8 @@ public:
 
 private:
 
-	auto WriteEventStart(U32 userId, U32 siteId, U32 cameraId) -> EventId;
-	auto WriteEventEnd(EventId eventId) -> void;
+	EventId WriteEventStart(U32 userId, U32 siteId, U32 cameraId);
+	void    WriteEventEnd(EventId eventId);
 
 private:
 

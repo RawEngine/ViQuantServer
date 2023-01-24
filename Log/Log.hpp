@@ -31,7 +31,7 @@ public:
 
 private:
 
-	auto ThreadProc() -> void;
+	void ThreadProc();
 
 	struct Info
 	{

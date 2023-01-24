@@ -20,7 +20,7 @@ namespace Socket
 {
 	// IMPORTANT: Exception is thrown on failure. User is responsible for handling the exception.
 	// port - If set to zero, the service provider assigns a unique port to the application with a value between 1024 and 5000.
-	auto CreateServer(U16& rPort, int maxConnectionsQuery, bool isBlocking /* = false */) -> SocketId
+	SocketId CreateServer(U16& rPort, int maxConnectionsQuery, bool isBlocking /* = false */)
 	{
 		SocketId socketId = Socket::Create();
 
@@ -58,7 +58,7 @@ namespace Socket
 		return socketId;
 	}
 
-	auto Create() -> SocketId
+	SocketId Create()
 	{
 		SocketId socketId = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -71,7 +71,7 @@ namespace Socket
 		return socketId;
 	}
 
-	auto Close(SocketId& rSocketId) -> void
+	void Close(SocketId& rSocketId)
 	{
 		if (rSocketId != INVALID_SOCKET)
 		{
@@ -85,7 +85,7 @@ namespace Socket
 		}
 	}
 /*
-	auto Connect(SocketId socketId, const String& rAddress, U16 port, int connectAttempts) -> void
+	void Connect(SocketId socketId, const String& rAddress, U16 port, int connectAttempts)
 	{
 		sockaddr_in addr{};
 
@@ -145,7 +145,7 @@ namespace Socket
 		Socket::SendText(socketId, buffer);
 	}
 
-	auto Send(SocketId socketId, const char* pBuffer, const ssize_t bufferSize) -> void
+	void Send(SocketId socketId, const char* pBuffer, const ssize_t bufferSize)
 	{
 		// MSG_NOSIGNAL - Requests not to send SIGPIPE on errors on stream oriented sockets when the other end breaks the connection.
 		ssize_t numBytesSent = 0;
@@ -184,7 +184,7 @@ namespace Socket
 //		LOG_MESSAGE("Sent %" PRIu64 " bytes. (Total: %" PRIu64 " bytes)", numBytesSent, bufferSize);
 	}
 
-	auto Read(SocketId socketId, char* pBuffer, const size_t bufferSize) -> bool
+	bool Read(SocketId socketId, char* pBuffer, const size_t bufferSize)
 	{
 		size_t bytesReceivedTotal = 0;
 
@@ -222,7 +222,7 @@ namespace Socket
 		return (bytesReceivedTotal == bufferSize);
 	}
 
-	auto Read(SocketId socketId, Vector<char>& rDataBuffer) -> void
+	void Read(SocketId socketId, Vector<char>& rDataBuffer)
 	{
 		char buffer[1024];
 
@@ -316,5 +316,4 @@ namespace Socket
 		return errno;
 #endif
 	}
-
-} // namespace Socket
+}

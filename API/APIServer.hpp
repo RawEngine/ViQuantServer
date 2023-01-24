@@ -21,17 +21,17 @@ private:
 //	void HandleRead();
 //	void HandleTimeouts();
 
-	auto HandleCGI(APIClientId clientId, const String& rCGI) -> void;
-	auto HandleCGI_ArmState(const String& rCGI, bool isArmed) -> void;
+	void HandleCGI(APIClientId clientId, const String& rCGI);
+	void HandleCGI_ArmState(const String& rCGI, bool isArmed);
 
-	auto AddClient(SocketId socketId) -> APIClientId;
+	APIClientId AddClient(SocketId socketId);
 
-	auto HandleCameraArmState(U32 cameraId, bool isArmed) -> void;
+	void HandleCameraArmState(U32 cameraId, bool isArmed);
 
-	auto GetDatabaseFTPCamerasArmStatesBySite(U32 siteId, Vector<U32>& rList) -> bool;
-	auto GetDatabaseFTPCameraHashKey(U32 cameraId, String& rHashKey, bool& rIsArmed) -> bool;
-	auto SetDatabaseFTPCameraArmState(U32 cameraId, bool isArmed) -> void;
-	auto SetDatabaseFTPCamerasSiteArmState(U32 siteId, bool isArmed) -> void;
+	bool GetDatabaseFTPCamerasArmStatesBySite(U32 siteId, Vector<U32>& rList);
+	bool GetDatabaseFTPCameraHashKey(U32 cameraId, String& rHashKey, bool& rIsArmed);
+	void SetDatabaseFTPCameraArmState(U32 cameraId, bool isArmed);
+	void SetDatabaseFTPCamerasSiteArmState(U32 siteId, bool isArmed);
 
 private:
 

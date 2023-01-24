@@ -99,7 +99,7 @@ Analytics::~Analytics()
 	LOG_MESSAGE(Log::Channel::Analytics, "Analytics system is stopped.");
 }
 
-auto Analytics::AddEvent(EventId eventId, U32 cameraId, U8 personThreshold, const String& rFootagePath) -> void
+void Analytics::AddEvent(EventId eventId, U32 cameraId, U8 personThreshold, const String& rFootagePath)
 {
 	LOG_MESSAGE(Log::Channel::Analytics, "Analytics starts new session. (EventId: %" PRIu64 ", CameraId: %u, PersonThreshold: %u, Path: '%s')", eventId, cameraId, personThreshold, rFootagePath.c_str());
 
@@ -181,7 +181,7 @@ auto Analytics::AddEvent(EventId eventId, U32 cameraId, U8 personThreshold, cons
 	mEventMap[eventId].sessionId = id;
 }
 
-auto Analytics::EndEvent(EventId eventId) -> void
+void Analytics::EndEvent(EventId eventId)
 {
 #if 1
 	auto it = mEventMap.find(eventId);
@@ -207,7 +207,7 @@ auto Analytics::EndEvent(EventId eventId) -> void
 	{
 		LOG_MESSAGE(Log::Channel::Analytics, "Analytics session (id: %u, Event id: %" PRIu64 ") ended.", rSession.sessionId, eventId);
 
-		this->ReleaseSession(rSession.sessionId);
+		ReleaseSession(rSession.sessionId);
 
 		mEventMap.erase(it);
 	}
@@ -221,7 +221,7 @@ auto Analytics::EndEvent(EventId eventId) -> void
 	{
 		if (mAnalyticsEvents.at(i) == eventId)
 		{
-			this->ReleaseSession(i);
+			ReleaseSession(i);
 			break;
 		}
 	}
@@ -233,14 +233,14 @@ auto Analytics::EndEvent(EventId eventId) -> void
 // Add's information about the event's footage that should be shaduled for processing as soon as possible.
 // Analytics manager works on a separate thread.
 // All the queued footage will be handled by the "HandleQueuedFootageList".
-auto Analytics::AddFootage(EventId eventId, EventFootageId eventFootageId, const String& rName) -> void
+void Analytics::AddFootage(EventId eventId, EventFootageId eventFootageId, const String& rName)
 {
 	mFootageMutex.lock();
 	mFootageQueue.emplace_back(eventId, eventFootageId, rName);
 	mFootageMutex.unlock();
 }
 
-auto Analytics::ReleaseSession(AnalyticsSessionId id) -> void
+void Analytics::ReleaseSession(AnalyticsSessionId id)
 {
 	Socket::Close(mAnalyticsSockets.at(id));
 
@@ -251,7 +251,7 @@ auto Analytics::ReleaseSession(AnalyticsSessionId id) -> void
 //	mAnalyticsSessions.at(id).reset();
 }
 
-auto Analytics::HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP) -> bool
+bool Analytics::HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP)
 {
 	const auto socketId = mAnalyticsSockets.at(id);
 
@@ -278,7 +278,7 @@ auto Analytics::HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP
 		// TODO: Proper cleanup?
 		int errorCode = Socket::GetErrorCode();
 		LOG_ERROR(Log::Channel::Analytics, "Analytics socket failed for \"select\"! (Error code: %d)", errorCode);
-		this->ReleaseSession(id);
+		ReleaseSession(id);
 	}
 	else
 	{
@@ -289,14 +289,14 @@ auto Analytics::HandleConnect(AnalyticsSessionId id, const TimePoint& rCurrentTP
 		{
 			const auto eventId = mAnalyticsEvents.at(id);
 			LOG_ERROR(Log::Channel::Analytics, "Analytics socket failed to connect to: %s:%d (Timeout %d sec, EventId: %" PRIu64 ")", mServerAddress.c_str(), mServerPort, mConnectTimeoutSec, eventId);
-			this->ReleaseSession(id);
+			ReleaseSession(id);
 		}
 	}
 
 	return false;
 }
 
-auto Analytics::HandleRead(AnalyticsSessionId id) -> void
+void Analytics::HandleRead(AnalyticsSessionId id)
 {
 	const auto socketId = mAnalyticsSockets.at(id);
 
@@ -397,7 +397,7 @@ auto Analytics::HandleRead(AnalyticsSessionId id) -> void
 	}
 }
 
-auto Analytics::HandleSend(AnalyticsSessionId id) -> void
+void Analytics::HandleSend(AnalyticsSessionId id)
 {
 	if (mAnalyticsStatus.at(id) == SatusFlags::Handshake)
 	{
@@ -439,7 +439,7 @@ auto Analytics::HandleSend(AnalyticsSessionId id) -> void
 		catch (const Exception& e)
 		{
 			LOG_ERROR(Log::Channel::Analytics, "Analytics::HandleSend[HANDSHAKE]: %s\n", e.GetText());
-			this->ReleaseSession(id);
+			ReleaseSession(id);
 			return;
 		}
 
@@ -453,7 +453,7 @@ auto Analytics::HandleSend(AnalyticsSessionId id) -> void
 */
 }
 
-auto Analytics::ThreadProc() -> void
+void Analytics::ThreadProc()
 {
 	LOG_MESSAGE(Log::Channel::Analytics, "Analytics thread started.");
 	LOG_MESSAGE(Log::Channel::Analytics, "Analytics server: %s:%d", mServerAddress.c_str(), mServerPort);
@@ -479,20 +479,20 @@ auto Analytics::ThreadProc() -> void
 
 				if (mAnalyticsStatus.at(id) == SatusFlags::Connecting)
 				{
-					if (!this->HandleConnect(id, currentTP))
+					if (!HandleConnect(id, currentTP))
 						continue; // If session is not connected, there is no point of continuing.
 				}
 
-				this->HandleRead(id);
+				HandleRead(id);
 
-				this->HandleSend(id);
+				HandleSend(id);
 			}
 
-			this->WriteQueuedResults(database);
+			WriteQueuedResults(database);
 
-			this->HandleQueuedFootageList();
+			HandleQueuedFootageList();
 
-			this->HandleQueuedFootageMap();
+			HandleQueuedFootageMap();
 
 			// TMEP?
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -506,7 +506,7 @@ auto Analytics::ThreadProc() -> void
 	LOG_MESSAGE(Log::Channel::Analytics, "Analytics thread stopped.");
 }
 
-auto SendFootageTask(SocketId socketId, String path, String name, EventFootageId eventFootageId, std::shared_ptr<std::atomic_bool> footageSendAllowedPtr) -> void
+void SendFootageTask(SocketId socketId, String path, String name, EventFootageId eventFootageId, std::shared_ptr<std::atomic_bool> footageSendAllowedPtr)
 {
 	const String fileName(path + name);
 	Vector<char> fileBuffer;
@@ -573,7 +573,7 @@ auto SendFootageTask(SocketId socketId, String path, String name, EventFootageId
 }
 
 // Checks if there is any queued footage that needs to be mapped to the event queue.
-auto Analytics::HandleQueuedFootageList() -> void
+void Analytics::HandleQueuedFootageList()
 {
 	std::lock_guard<std::mutex> lock(mFootageMutex);
 
@@ -602,7 +602,7 @@ auto Analytics::HandleQueuedFootageList() -> void
 	mFootageQueue.clear();
 }
 
-auto Analytics::HandleQueuedFootageMap() -> void
+void Analytics::HandleQueuedFootageMap()
 {
 	if (mEventMap.empty())
 		return;
@@ -689,16 +689,16 @@ void Analytics::WriteQueuedResults(Database::Connection& rDatabase)
 		}
 
 		// "<Root incompleteResult="0" count="1" fileId="3295">"
-		auto eventFootageId = this->WriteXMLParsedResults(rDatabase, rResult.sessionId, rResult.cameraId, rResult.eventId, rResult.name);
+		auto eventFootageId = WriteXMLParsedResults(rDatabase, rResult.sessionId, rResult.cameraId, rResult.eventId, rResult.name);
 
-		this->WriteXML(rDatabase, eventFootageId, rResult.name);
+		WriteXML(rDatabase, eventFootageId, rResult.name);
 
 
 		mResultQueue.pop();
 	}
 }
 
-auto Analytics::WriteXML(Database::Connection& rDatabase, EventFootageId eventFootageId, const String& rXML) -> void
+void Analytics::WriteXML(Database::Connection& rDatabase, EventFootageId eventFootageId, const String& rXML)
 {
 	std::ostringstream ss;
 
@@ -709,7 +709,7 @@ auto Analytics::WriteXML(Database::Connection& rDatabase, EventFootageId eventFo
 	query.Exec(ss.str());
 }
 
-auto Analytics::WriteXMLParsedResults(Database::Connection& rDatabase, AnalyticsSessionId sessionId, U32 cameraId, EventId eventId, const String& rXML) -> EventFootageId
+EventFootageId Analytics::WriteXMLParsedResults(Database::Connection& rDatabase, AnalyticsSessionId sessionId, U32 cameraId, EventId eventId, const String& rXML)
 {
 	tinyxml2::XMLDocument xml;
 

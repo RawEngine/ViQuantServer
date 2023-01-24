@@ -9,11 +9,11 @@ namespace Database
 {
 	namespace Users
 	{
-		auto GetId(Connection& rConnection, const String& rUsername, const String& rPassword) -> U32
+		U32 GetId(Connection& rConnection, const String& rUsername, const String& rPassword)
 		{
 			std::ostringstream ss;
 
-			ss << "SELECT "		<< Id 
+			ss  << "SELECT "	<< Id 
 				<< " FROM "		<< TableName
 				<< " WHERE "	<< Username << "=\'" << rConnection.EscapeString(rUsername)
 				<< "\' AND "	<< Password << "=\'" << rConnection.EscapeString(rPassword) << "\'";
