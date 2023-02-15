@@ -62,13 +62,14 @@ public:
 
 private:
 
-	auto AddClient(SocketId socketId) -> ClientId;
+	ClientId AddClient(SocketId socketId);
 
 	void SetupAuthSQLQuery();
 
 	bool CheckAuthentification(EventSessionId eventSessionId, const String& rUsername, const String& rPassword, U32* pUserId, U32* pSiteId, U32* pCameraId, bool* pIsArmed, U8* pPersonThreshold);
 
 	FTPCommand GetCommandType(char* pBuffer, ssize_t size);
+
 	String GetCommandName(FTPCommand commandType);
 
 private:

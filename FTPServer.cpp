@@ -69,7 +69,7 @@ FTPServer::FTPServer(Main& rApp, U32 passiveSockTimeoutSec)
 	: mMain(rApp)
 	, mPassiveSocketTimeoutSec(passiveSockTimeoutSec)
 {
-	this->SetupAuthSQLQuery();
+	SetupAuthSQLQuery();
 
 	const size_t numPreAllocatedClients = 64;
 
@@ -104,7 +104,7 @@ bool FTPServer::Start(U16 port)
 	return true;
 }
 
-auto FTPServer::AddClient(SocketId socketId) -> ClientId
+ClientId FTPServer::AddClient(SocketId socketId)
 {
 	ClientId id;
 
@@ -168,7 +168,7 @@ void FTPServer::HandleNewConnection()
 		LOG_MESSAGE(Log::Channel::FTP, "FTP connection from: %s:%d", clientIPString.c_str(), clientPort);
 	}
 
-	const auto clientId = this->AddClient(clientSocket);
+	const ClientId clientId = AddClient(clientSocket);
 
 	mClientActiveIds.push_back(clientId);
 
@@ -442,9 +442,9 @@ void FTPServer::HandleClients(Database::Connection& rDatabase)
 		mClientTimePoints.at(clientId) = currentTP;
 
 		//==============================================================================
-		const auto commandType = this->GetCommandType(buffer, bytesReceived);
+		const auto commandType = GetCommandType(buffer, bytesReceived);
 
-		LOG_MESSAGE(Log::Channel::FTP, "FTP Command: %s", this->GetCommandName(commandType).c_str());
+		LOG_MESSAGE(Log::Channel::FTP, "FTP Command: %s", GetCommandName(commandType).c_str());
 
 		switch (commandType)
 		{
@@ -503,7 +503,7 @@ void FTPServer::HandleClients(Database::Connection& rDatabase)
 
 						// Check database and validate the client.
 						// HM: If client is not valid - dont send any response?
-						if (!this->CheckAuthentification(eventSessionId, username, password, &userId, &siteId, &cameraId, &isArmed, &personThreshold))
+						if (!CheckAuthentification(eventSessionId, username, password, &userId, &siteId, &cameraId, &isArmed, &personThreshold))
 						{
 //							Socket::SendText(rSocketId, "530 Failed to authenticate. \r\n");
 							Socket::Close(rSocketId);
@@ -794,7 +794,7 @@ void FTPServer::HandleClients(Database::Connection& rDatabase)
 						auto footageIndex = mClientEventSessionFootageOffsetIndexes.at(clientId)++;
 
 						// Enter the "timout-lock" stage. (don't timeout while footage is downloading or queued for download)
-						this->ClientTimeoutLock(clientId);
+						ClientTimeoutLock(clientId);
 
 						// NOTE:
 						// Download footage task is added to the thread pool task queue.

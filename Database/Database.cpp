@@ -58,7 +58,7 @@ namespace Database
 
 	bool Connection::ReConnect()
 	{
-		return this->Connect(mInfo);
+		return Connect(mInfo);
 	}
 
 #if 0
@@ -144,7 +144,7 @@ namespace Database
 		if (mysql_ping(mpHandle) != 0)
 		{
 			LOG_WARNING("Disconnected from the Database! (Trying to reconnec)");
-			this->Connect(mDatabaseInfo);
+			Connect(mDatabaseInfo);
 			// TODO...
 		}
 

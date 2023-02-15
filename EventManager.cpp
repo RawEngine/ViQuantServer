@@ -154,7 +154,7 @@ void EventManager::HandleTimeouts()
 				// The "eventId" value can be "0" when dealing with a non-validated connection.
 				if (eventId != InvalidEventId)
 				{
-					this->WriteEventEnd(eventId);
+					WriteEventEnd(eventId);
 
 					mMain.AnalyticsPtr->EndEvent(eventId);
 
@@ -281,7 +281,7 @@ void EventManager::HandleQueuedFootageNotices()
 // Returns the unique (Database related) id of the event.
 EventId EventManager::AuthenticateSession(EventSessionId sessionId, U32 userId, U32 siteId, U32 cameraId)
 {
-	auto eventId = this->WriteEventStart(userId, siteId, cameraId);
+	const EventId eventId = WriteEventStart(userId, siteId, cameraId);
 
 	mSessionUserIds.at(sessionId) = userId;
 	mSessionSiteIds.at(sessionId) = siteId;

@@ -34,7 +34,7 @@ CGIManager::CGIManager(const String& rHostname, U16 port)
 	// TMEP: Testing...
 	for (int i = 0; i < 5; ++i)
 	{
-		this->Add("/ui/inform-user.php?eventID=" + std::to_string(i));
+		Add("/ui/inform-user.php?eventID=" + std::to_string(i));
 	}
 */
 }
